@@ -1,53 +1,47 @@
+const bcrypt = require('bcrypt');
 const pool = require("../../config/database");
 
 module.exports = {
-  create: (data, callBack) => {
-    pool.query(
-      `insert into user(id, name, email, address,city) values(?,?,?,?,?)`,
-      [data.id, data.name, data.email, data.address, data.city],
-      (error, results, fields) => {
-        if (error) {
-          console.log(error);
-          callBack(error);
-        }
-        return callBack(null, results);
+  create: (data, callback) => {
+    bcrypt.hash(data.password, 10, async (err, hashedPassword) => {
+      if (err) {
+        return callback(err, null);
       }
-    );
+
+      try {
+        const hashedPasswordKey = await bcrypt.hash('your_password_key', 10);
+        const query = `
+          INSERT INTO em_user (username, password, password_key, email, status, user_ip)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `;
+
+        const insertValues = [
+          data.username,
+          hashedPassword,
+          hashedPasswordKey,
+          data.email,
+          data.status,
+          data.user_ip
+        ];
+
+        pool.query(query, insertValues, (error, results, fields) => {
+          if (error) {
+            return callback(error, null);
+          }
+          return callback(null, results);
+        });
+      } catch (error) {
+        return callback(error, null);
+      }
+    });
   },
 
-  getUsers: (callBack) => {
-    // pool.getConnection(function(err, connection) {
-    //   console.log('err',err);
-    //   if (err) throw err; // not connected!
-    //  console.log('connection',connection)
-    //   // Use the connection
-    //   connection.query('select from user', function (error, results, fields) {
-    //     // When done with the connection, release it.
-    //     connection.release();
-    //     console.log('results====',results)
-    //     // Handle error after the release.
-    //     if (error) throw error;
-    //     return callBack(null, results);
-    //     // Don't use the connection here, it has been returned to the pool.
-    //   });
-    // });
-
-    // pool.query('select from user', function (error, results, fields) {
-    //   console.log('sssss',results);
-    //   console.log('error',error);
-
-    //   if (error) {
-    //      callBack(null,error);
-    //    }
-    //    return callBack(null, results);
-    //   console.log('The solution is: ', results[0].solution);
-    // });
-
-    pool.query(`select * from user`, (error, results, fields) => {
+  getUsers: (callback) => {
+    pool.query(`SELECT * FROM em_user`, (error, results, fields) => {
       if (error) {
-        return callBack(null, error);
+        return callback(error, null);
       }
-      return callBack(null, results);
+      return callback(null, results);
     });
   },
 };
