@@ -6,9 +6,10 @@ module.exports = {
     const body = req.body;
     create(body, (err, results) => {
       if (err) {
+        console.error('Database error:', err); // Log the error for debugging purposes
         return res.status(500).json({
           success: 0,
-          message: "Database connection error",
+          message: err.message || 'Database operation error', // Send the specific error message
         });
       }
       return res.status(200).json({
