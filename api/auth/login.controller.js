@@ -33,12 +33,20 @@ module.exports = {
       return res.status(401).json({ success: 0, message: 'Unauthorized: No token provided' });
     }
 
-    jwt.verify(token, 'your_secret_key', (err, decoded) => {
+    jwt.verify(token, 'your_secret_key', (err, decoded) => {    
       if (err) {
-        return res.status(401).json({ success: 0, message: 'Unauthorized: Invalid token' });
+        // Log the detailed error for debugging
+        console.error('JWT Verification Error:', err);
+    
+        // Return a more informative error response
+        return res.status(401).json({
+          success: 0,
+          message: `Unauthorized: Invalid token. ${err.message}`, // Include the error message
+        });
       }
-      req.userId = decoded.userId;
-      next();
+      return res.status(401).json({ success: 1, message:'Authorized successfully', user: decoded });
+      
     });
+    
   }
 };
