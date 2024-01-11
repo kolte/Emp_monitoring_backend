@@ -39,10 +39,7 @@ module.exports = {
     if (!token) {
       return res.status(401).json({ success: 0, message: 'Unauthorized: Invalid token' });
     }
-    // const token = req.headers.authorization?.split(' ')[1]; // Assuming token is in Authorization header
-    if (!token) {
-      return res.status(401).json({ success: 0, message: 'Unauthorized: No token provided' });
-    }
+    // const token = req.headers.authorization?.split(' ')[1]; // Assuming token is in 
 
     jwt.verify(token, process.env.secretkey, (err, decoded) => {
       if (err) {
