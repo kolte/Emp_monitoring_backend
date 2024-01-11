@@ -18,7 +18,7 @@ module.exports = {
         return res.status(401).json({ success: 0, message: 'Invalid password' });
       }
 
-      const token = jwt.sign({ userId: user.id }, 'your_secret_key', { expiresIn: '1h' }); // Adjust secret and expiration
+      const token = jwt.sign({ userId: user.id }, process.env.secretkey, { expiresIn: '1h' }); // Adjust secret and expiration
       return res.status(200).json({ success: 1, token });
 
     } catch (error) {
@@ -33,7 +33,7 @@ module.exports = {
       return res.status(401).json({ success: 0, message: 'Unauthorized: No token provided' });
     }
 
-    jwt.verify(token, 'your_secret_key', (err, decoded) => {    
+    jwt.verify(token, process.env.secretkey, (err, decoded) => {    
       if (err) {
         // Log the detailed error for debugging
         console.error('JWT Verification Error:', err);
