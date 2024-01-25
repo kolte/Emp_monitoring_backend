@@ -9,6 +9,7 @@ module.exports = {
       employee_id,
       leave_reason,
       days,
+      half
     } = data;
 
     // Check if attendance with the same date exists for the employee
@@ -27,7 +28,7 @@ module.exports = {
           // Attendance exists, update the existing record
           const updateAttendanceQuery = `
           UPDATE em_employee_attendance_details 
-          SET leave_type_id = ?, leave_reason = ?, created_at = ?, updated_at = ?,days=?
+          SET leave_type_id = ?, leave_reason = ?, created_at = ?, updated_at = ?,days=?,half=?
           WHERE employee_id = ?`;
 
           pool.query(
@@ -38,6 +39,7 @@ module.exports = {
               created_at,
               updated_at,
               days,
+              half,
               employee_id,
             ],
             (updateError, updateResults) => {
@@ -51,8 +53,8 @@ module.exports = {
         } else {
           const insertAttendanceDataQuery = `
           INSERT INTO em_employee_attendance_details 
-          (employee_id, employee_attendance_id, leave_type_id, approval_user_id, leave_reason,created_at,updated_at,days) 
-          VALUES (?, 2, ?, 1, ?, ?,?,?)`;
+          (employee_id, employee_attendance_id, leave_type_id, approval_user_id, leave_reason,created_at,updated_at,days,half) 
+          VALUES (?, 2, ?, 1, ?, ?,?,?,?)`;
 
           pool.query(
             insertAttendanceDataQuery,
@@ -63,6 +65,7 @@ module.exports = {
               created_at,
               updated_at,
               days,
+              half
             ],
             (insertError, insertResults) => {
               if (insertError) {
