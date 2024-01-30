@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { fileUpload } = require("./filesupload.controller");
-var multer = require("multer");
+const multer = require("multer");
+const authenticate = require("./authenticate.middleware");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -20,12 +21,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-router.post("/", upload.single("image"), function (req, res, next) {
-  try {
-    return res.status(200).json({ message: "File uploaded successfully!" });
-  } catch (error) {
-    return res.status(400).json({ message: error.message });
-  }
-});
+
+router.post("/", authenticate, upload.single("image"), fileUpload);
 
 module.exports = router;
