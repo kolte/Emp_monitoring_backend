@@ -10,7 +10,7 @@ const leave = require("./api/leave/leave.router");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
-
+app.use("/uploads", express.static("uploads"));
 app.use("/api/users",userRouter);
 app.use("/api/filesupload",filesupload);
 app.use("/api/login",login);
