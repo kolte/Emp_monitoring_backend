@@ -3,7 +3,7 @@ const pool = require("../../config/database");
 module.exports = {
   create: (data, callBack) => {
     pool.query(
-      `INSERT INTO em_employee_attendance_pc_screenshot (employee_id, employee_attendance_id, screenshot_url,active_screen,mouse_click,keyboard_click, screenshot_time) VALUES (?, ?, ?,?,?,?)`,
+      `INSERT INTO em_employee_attendance_pc_screenshot (employee_id, employee_attendance_id, screenshot_url,active_screen,mouse_click,keyboard_click, screenshot_time) VALUES (?, ?, ?,?,?,?,?)`,
       [
         data.employee_id,
         data.employee_attendance_id,
