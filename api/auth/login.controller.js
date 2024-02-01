@@ -19,7 +19,7 @@ module.exports = {
       }
 
       const token = jwt.sign({ userId: user.id }, process.env.secretkey, { expiresIn: '1h' }); // Adjust secret and expiration
-      return res.status(200).json({ success: 1, token });
+      return res.status(200).json({ success: 1, token, userId:user.id });
 
     } catch (error) {
       console.error('Login error:', error);
