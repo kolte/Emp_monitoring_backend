@@ -28,7 +28,49 @@ module.exports = {
           if (error) {
             return callback(error, null);
           }
-          return callback(null, results);
+          // Get the user_id of the newly inserted user
+          const userId = results.insertId;
+
+          // Now insert into em_employee table
+          const employeeQuery = `
+            INSERT INTO em_employee (employee_code, first_name, last_name, middle_name, date_of_birth, gender,
+              email, phone, user_id, job_id, department_id, reporting_to, salary_info, hire_date, employment_status,
+              address_line1, address_line2, pin_code, city, state, work_location, emergency_contact, bank_info)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `;
+
+          const employeeValues = [
+            data.employee_code,
+            data.first_name,
+            data.last_name,
+            data.middle_name,
+            data.date_of_birth,
+            data.gender,
+            data.email,
+            data.phone,
+            userId,  // user_id from em_user
+            data.job_id,
+            data.department_id,
+            data.reporting_to,
+            data.salary_info,
+            data.hire_date,
+            data.employment_status,
+            data.address_line1,
+            data.address_line2,
+            data.pin_code,
+            data.city,
+            data.state,
+            data.work_location,
+            data.emergency_contact,
+            data.bank_info
+          ];
+
+          pool.query(employeeQuery, employeeValues, (employeeError, employeeResults) => {
+            if (employeeError) {
+              return callback(employeeError, null);
+            }
+            return callback(null, { userResults: results, employeeResults });
+          });
         });
       } catch (error) {
         return callback(error, null);
@@ -38,6 +80,68 @@ module.exports = {
 
   getUsers: (callback) => {
     pool.query(`SELECT * FROM em_user`, (error, results, fields) => {
+      if (error) {
+        return callback(error, null);
+      }
+      return callback(null, results);
+    });
+  },
+
+  updateUser: (userId, data, callback) => {
+    const updateQuery = `
+      UPDATE em_employee
+      SET
+        employee_code = ?,
+        first_name = ?,
+        last_name = ?,
+        middle_name = ?,
+        date_of_birth = ?,
+        gender = ?,
+        email = ?,
+        phone = ?,
+        job_id = ?,
+        department_id = ?,
+        reporting_to = ?,
+        salary_info = ?,
+        hire_date = ?,
+        employment_status = ?,
+        address_line1 = ?,
+        address_line2 = ?,
+        pin_code = ?,
+        city = ?,
+        state = ?,
+        work_location = ?,
+        emergency_contact = ?,
+        bank_info = ?
+      WHERE user_id = ?`;
+
+    const updateValues = [
+      data.employee_code,
+      data.first_name,
+      data.last_name,
+      data.middle_name,
+      data.date_of_birth,
+      data.gender,
+      data.email,
+      data.phone,
+      data.job_id,
+      data.department_id,
+      data.reporting_to,
+      data.salary_info,
+      data.hire_date,
+      data.employment_status,
+      data.address_line1,
+      data.address_line2,
+      data.pin_code,
+      data.city,
+      data.state,
+      data.work_location,
+      data.emergency_contact,
+      data.bank_info,
+      userId
+    ];
+
+    pool.query(updateQuery, updateValues, (error, results, fields) => {
       if (error) {
         return callback(error, null);
       }
