@@ -113,7 +113,7 @@ module.exports = {
         work_location = ?,
         emergency_contact = ?,
         bank_info = ?
-      WHERE user_id = ?`;
+      WHERE id = ?`;
 
     const updateValues = [
       data.employee_code,
@@ -140,7 +140,7 @@ module.exports = {
       data.bank_info,
       userId
     ];
-
+// console.log(updateValues);
     pool.query(updateQuery, updateValues, (error, results, fields) => {
       if (error) {
         return callback(error, null);
