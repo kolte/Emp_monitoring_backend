@@ -65,4 +65,14 @@ module.exports = {
       });
     });
   },
+
+  getLatestAttendance: (req, res) => {
+    const { employeeId, date } = req.query;
+    datafetchService.getLatestAttendance(employeeId, date, (error, result) => {
+      if (error) {
+        return res.status(500).json({ success: 0, message: error.message });
+      }
+      return res.status(200).json({ success: 1, data: result });
+    });
+  }
 };

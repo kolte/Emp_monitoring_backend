@@ -52,4 +52,20 @@ module.exports = {
       return callback(null, results);
     });
   },
+
+  getLatestAttendance: (employeeId, date, callback) => {
+    const query = `
+      SELECT id,employee_id,date_start,present,leave_approved
+      FROM em_employee_attendance
+      WHERE employee_id = ? AND DATE(attendance_date) = ? 
+      ORDER BY attendance_date DESC
+      LIMIT 1
+    `;
+    pool.query(query, [employeeId, date], (error, results) => {
+      if (error) {
+        return callback(error, null);
+      }
+      return callback(null, results[0]);
+    });
+  }
 };
