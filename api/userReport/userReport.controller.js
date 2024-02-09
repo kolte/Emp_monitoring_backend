@@ -14,7 +14,8 @@ module.exports = {
     });
   },
   getUsersPunchReport: (req, res) => {
-    getUsersPunchReport((err, results) => {
+    const { employeeId } = req.query;
+    getUsersPunchReport(employeeId,(err, results) => {
       if (err) {
         return;
       }
