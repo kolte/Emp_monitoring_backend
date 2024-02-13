@@ -5,7 +5,7 @@ module.exports = {
   getUsers: (employeeId, callback) => {
    
 
-    pool.query(`SELECT * FROM em_employee_attendance where employee_id= ?`, employeeId, (error, results, fields) => {
+    pool.query(`SELECT * FROM em_employee_attendance where employee_id= ? GROUP BY attendance_date`, employeeId, (error, results, fields) => {
       if (error) {
         return callback(error, null);
       }
