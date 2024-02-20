@@ -14,6 +14,7 @@ const employeeList = require("./api/employeeList/employeeList.router");
 const leave = require("./api/leave/leave.router");
 const datafetchRouter = require("./api/datafetch/datafetch.router");
 const report = require("./api/userReport/userReport.router");
+const UserData = require("./api/UserData/UserData.router");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,6 +33,7 @@ app.use("/api/employeeList", employeeList);
 app.use("/api/leave", leave);
 app.use("/api/datafetch", datafetchRouter);
 app.use("/api/report", report);
+app.use("/api/userDetail",UserData);
 
 app.listen(3000, () => {
     console.log('Server is up and running on port', process.env.APP_PORT || 3000);
