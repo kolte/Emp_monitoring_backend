@@ -1,4 +1,4 @@
-const { getUsers ,getUsersPunchReport,getEmployeeScreenshots, getLatestFourScreenshots } = require("./userReport.service");
+const { getUsers ,getUsersPunchReport,getEmployeeScreenshots, getLatestFourScreenshots,getTimeReport } = require("./userReport.service");
 
 exports.getUsers = (req, res) => {
   const { employeeId } = req.query;
@@ -14,6 +14,18 @@ exports.getUsers = (req, res) => {
 exports.getUsersPunchReport = (req, res) => {
   const { employeeId } = req.query;
   getUsersPunchReport(employeeId, (error, results) => {
+    if (error) {
+      console.error("Error fetching users punch report:", error);
+      return res.status(500).json({ success: 0, message: "Internal Server Error" });
+    }
+    return res.json({ success: 1, data: results });
+  });
+};
+
+exports.getTimeReport = (req, res) => {
+  const { employeeId } = req.query;
+  const { date } = req.query;
+  getTimeReport(employeeId,date, (error, results) => {
     if (error) {
       console.error("Error fetching users punch report:", error);
       return res.status(500).json({ success: 0, message: "Internal Server Error" });
