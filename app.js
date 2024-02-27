@@ -35,6 +35,4 @@ app.use("/api/datafetch", datafetchRouter);
 app.use("/api/report", report);
 app.use("/api/userDetail",UserData);
 
-app.listen(3000, () => {
-    console.log('Server is up and running on port', process.env.APP_PORT || 3000);
-});
+app.listen(process.env.APP_PORT);
