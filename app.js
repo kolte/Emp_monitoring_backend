@@ -35,4 +35,8 @@ app.use("/api/datafetch", datafetchRouter);
 app.use("/api/report", report);
 app.use("/api/userDetail",UserData);
 
-app.listen(process.env.APP_PORT);
+const port = process.env.APP_TYPE === "prod" ? process.env.PORT : 3000;
+
+app.listen(port, () => {
+    console.log(`Server is up and running on port ${port}`);
+});
