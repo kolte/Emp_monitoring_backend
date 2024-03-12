@@ -148,4 +148,14 @@ module.exports = {
       return callback(null, results);
     });
   },
+  deleteUser: (userId, callback) => {
+    const deleteQuery = `DELETE FROM em_employee WHERE id = ?`;
+
+    pool.query(deleteQuery, [userId], (error, results, fields) => {
+      if (error) {
+        return callback(error, null);
+      }
+      return callback(null, results);
+    });
+  }
 };

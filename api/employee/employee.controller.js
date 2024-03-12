@@ -1,4 +1,4 @@
-const { create, getUsers, updateUser } = require("./employee.service");
+const { create, getUsers, updateUser, deleteUser } = require("./employee.service");
 
 module.exports = {
   createUser: (req, res) => {
@@ -52,4 +52,22 @@ module.exports = {
       });
     });
   },
+  deleteUser: (req, res) => {
+    const userId = req.params.id;
+
+    deleteUser(userId, (err, results) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({
+          success: 0,
+          message: err.message || 'Database operation error',
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: 'Employee deleted successfully',
+        data: results,
+      });
+    });
+  }
 };
