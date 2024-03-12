@@ -54,7 +54,7 @@ module.exports = {
           const insertAttendanceDataQuery = `
           INSERT INTO em_employee_attendance_details 
           (employee_id, employee_attendance_id, leave_type_id, approval_user_id, leave_reason,created_at,updated_at,days,half) 
-          VALUES (?, 2, ?, 1, ?, ?,?,?,?)`;
+          VALUES (?, 5, ?, 1, ?, ?,?,?,?)`;
 
           pool.query(
             insertAttendanceDataQuery,
