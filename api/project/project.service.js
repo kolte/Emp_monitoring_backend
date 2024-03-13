@@ -65,16 +65,37 @@ module.exports = {
   },
 
   deleteProject: (projectId, callback) => {
-    // Query to delete a project
-    const query = 'DELETE FROM em_job_projects WHERE project_id = ?';
+    // Query to delete a project from em_job_projects table
+    const deleteProjectQuery = 'DELETE FROM em_job_projects WHERE project_id = ?';
+    // Query to delete tasks associated with the project
+    const deleteTasksQuery = 'DELETE FROM em_job_tasks WHERE project_id = ?';
+    // Query to delete comments associated with the project's tasks
+    const deleteCommentsQuery = 'DELETE FROM em_job_comments WHERE task_id IN (SELECT task_id FROM em_job_tasks WHERE project_id = ?)';
+    // Query to delete attachments associated with the project's tasks
+    const deleteAttachmentsQuery = 'DELETE FROM em_job_attachments WHERE task_id IN (SELECT task_id FROM em_job_tasks WHERE project_id = ?)';
 
-    // Execute the query
-    pool.query(query, [projectId], (error, result) => {
-      if (error) {
-        return callback(error);
-      }
-      // Return the number of affected rows
-      return callback(null, result.affectedRows);
+    // Execute the delete queries sequentially
+    pool.query(deleteAttachmentsQuery, [projectId], (error, result) => {
+        if (error) {
+            return callback(error);
+        }
+        pool.query(deleteCommentsQuery, [projectId], (error, result) => {
+            if (error) {
+                return callback(error);
+            }
+            pool.query(deleteTasksQuery, [projectId], (error, result) => {
+                if (error) {
+                    return callback(error);
+                }
+                pool.query(deleteProjectQuery, [projectId], (error, result) => {
+                    if (error) {
+                        return callback(error);
+                    }
+                    return callback(null, result.affectedRows);
+                });
+            });
+        });
     });
-  }
+}
+
 };
