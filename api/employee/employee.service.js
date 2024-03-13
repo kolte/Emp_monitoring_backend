@@ -140,7 +140,7 @@ module.exports = {
       data.bank_info,
       userId
     ];
-// console.log(updateValues);
+    // console.log(updateValues);
     pool.query(updateQuery, updateValues, (error, results, fields) => {
       if (error) {
         return callback(error, null);
@@ -149,13 +149,67 @@ module.exports = {
     });
   },
   deleteUser: (userId, callback) => {
+    const disableForeignKeyChecksQuery = `SET FOREIGN_KEY_CHECKS = 0`;
     const deleteQuery = `DELETE FROM em_employee WHERE id = ?`;
 
-    pool.query(deleteQuery, [userId], (error, results, fields) => {
+    pool.query(disableForeignKeyChecksQuery, (disableError) => {
+      if (disableError) {
+        return callback(disableError, null);
+      }
+
+      pool.query(deleteQuery, [userId], (error, results, fields) => {
+        if (error) {
+          return callback(error, null);
+        }
+
+        const enableForeignKeyChecksQuery = `SET FOREIGN_KEY_CHECKS = 1`;
+        pool.query(enableForeignKeyChecksQuery, (enableError) => {
+          if (enableError) {
+            return callback(enableError, null);
+          }
+
+          return callback(null, results);
+        });
+      });
+    });
+  },
+  updateProfilePicture: (userId, profilePicture, callback) => {
+    const updateQuery = `
+      UPDATE em_employee
+      SET profile_picture = ?
+      WHERE id = ?
+    `;
+    const updateValues = [profilePicture, userId];
+
+    pool.query(updateQuery, updateValues, (error, results) => {
       if (error) {
         return callback(error, null);
       }
       return callback(null, results);
     });
-  }
+  }, 
+  getProfilePictureById: (employeeId, callback) => {
+    const query = `SELECT profile_picture FROM em_employee WHERE id = ?`;
+    pool.query(query, [employeeId], (error, results, fields) => {
+        if (error) {
+            return callback(error, null);
+        }
+        if (results.length === 0) {
+            return callback("Employee not found", null);
+        }
+        const profilePicture = results[0].profile_picture;
+        if (!profilePicture) {
+            return callback("Profile picture not found", null);
+        }
+        // Profile picture found, return success and the profile picture
+        return callback(null, {
+            success: 1,
+            profilePicture: profilePicture
+        });
+    });
+}
+
+
+
+
 };
