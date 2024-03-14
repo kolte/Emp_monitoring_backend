@@ -1,14 +1,25 @@
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors"); // Import the CORS module
+const cors = require("cors");
+const bodyParser = require('body-parser');
+
 const app = express();
+
+// Middleware to parse request bodies
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
+
+// CORS middleware
+app.use(cors());
+
+// Serve static files from the 'uploads' directory
+app.use("/uploads", express.static("uploads"));
 
 // Import routers
 const userRouter = require("./api/users/user.router");
 const empRouter = require("./api/employee/employee.router");
 const filesupload = require("./api/filesupload/filesupload.router");
 const login = require("./api/auth/login.router");
-const employee = require("./api/employee/employee.router");
 const attend = require("./api/attend/employeeAttendance.router");
 const employeeList = require("./api/employeeList/employeeList.router");
 const leave = require("./api/leave/leave.router");
@@ -20,31 +31,26 @@ const task = require("./api/task/task.router");
 const project = require("./api/project/project.router");
 const comment = require("./api/comment/comment.router");
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Use CORS middleware
-app.use(cors());
-
-app.use("/uploads", express.static("uploads"));
+// Define routes
 app.use("/api/users", userRouter);
 app.use("/api/employee", empRouter);
 app.use("/api/filesupload", filesupload);
 app.use("/api/login", login);
-app.use("/api/emp", employee);
 app.use("/api/attend", attend);
 app.use("/api/employeeList", employeeList);
 app.use("/api/leave", leave);
 app.use("/api/datafetch", datafetchRouter);
 app.use("/api/report", report);
-app.use("/api/userDetail",UserData);
-app.use("/api/dashboard",dashboard);
-app.use("/api/task",task);
-app.use("/api/project",project);
-app.use("/api/comment",comment);
+app.use("/api/userDetail", UserData);
+app.use("/api/dashboard", dashboard);
+app.use("/api/task", task);
+app.use("/api/project", project);
+app.use("/api/comment", comment);
 
+// Determine port based on environment
 const port = process.env.APP_TYPE === "prod" ? process.env.PORT : 3000;
 
+// Start the server
 app.listen(port, () => {
     console.log(`Server is up and running on port ${port}`);
 });
