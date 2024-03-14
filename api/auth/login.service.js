@@ -2,10 +2,10 @@ const bcrypt = require('bcrypt');
 const pool = require("../../config/database");
 
 module.exports = {
-  getUserByUsername: async (username) => {
+  getUserByUsername: async (username, employeeId) => {
     return new Promise((resolve, reject) => {
-      const query = 'SELECT * FROM em_user WHERE (username = ? OR email = ?) LIMIT 1';
-      pool.query(query, [username, username], (error, results) => {
+      const query = 'SELECT *,em_employee.id as employeeId,em_user.id as userId FROM em_user INNER JOIN em_employee ON em_user.id = em_employee.user_id WHERE (em_user.username = ? OR em_user.email = ?) LIMIT 1';
+      pool.query(query, [username, username, employeeId], (error, results) => {
         if (error) {
           console.error('Error in getUserByUsername:', error);
           reject(error); // Reject the promise in case of an error
