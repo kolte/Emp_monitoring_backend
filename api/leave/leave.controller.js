@@ -1,4 +1,4 @@
-const { createOrUpdateLeave,getLeaveTypeData } = require("./leave.service");
+const { createOrUpdateLeave,getLeaveTypeData,getLeaveDatesWithEmployeeDetails } = require("./leave.service");
 
 module.exports = {
   createLeave: (req, res) => {
@@ -36,4 +36,19 @@ module.exports = {
       });
     });
   },
+  getLeaveDatesWithDetails: (req, res) => {
+    getLeaveDatesWithEmployeeDetails((err, results) => {
+      if (err) {
+        return res.status(500).json({
+          success: 0,
+          message: "Database operation error",
+        });
+      }
+
+      return res.status(200).json({
+        success: 1,
+        data: results,
+      });
+    });
+  }
 };
