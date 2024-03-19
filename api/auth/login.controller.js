@@ -18,7 +18,7 @@ module.exports = {
         return res.status(401).json({ success: 0, message: 'Invalid password' });
       }
 
-      const token = jwt.sign({ userId: user.id }, process.env.secretkey, { expiresIn: '1h' }); // Adjust secret and expiration
+      const token = jwt.sign({ userId: user.id }, process.env.secretkey, { expiresIn: '12h' }); // Adjust secret and expiration
       return res.status(200).json({ success: 1, token, userId:user.userId, empID:user.employeeId });
 
     } catch (error) {
