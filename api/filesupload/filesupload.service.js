@@ -14,7 +14,6 @@ module.exports = {
         new Date(),
       ],
       (error, results, fields) => {
-        console.log("active_screen-------", data.active_screen);
         if (error) {
           console.log(error);
           return callBack(error);
