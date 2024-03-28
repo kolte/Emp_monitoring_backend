@@ -30,6 +30,9 @@ const dashboard = require("./api/dashboard/dashboard.router");
 const task = require("./api/task/task.router");
 const project = require("./api/project/project.router");
 const comment = require("./api/comment/comment.router");
+const menu = require("./api/menu/menu.router");
+const moduleset = require("./api/module/module.router");
+const permission = require("./api/permission/permission.router");
 
 // Define routes
 app.use("/api/users", userRouter);
@@ -46,6 +49,9 @@ app.use("/api/dashboard", dashboard);
 app.use("/api/task", task);
 app.use("/api/project", project);
 app.use("/api/comment", comment);
+app.use("/api/menu", menu);
+app.use("/api/module", moduleset);
+app.use("/api/permission", permission);
 
 // Determine port based on environment
 const port = process.env.APP_TYPE === "prod" ? process.env.PORT : 3000;
