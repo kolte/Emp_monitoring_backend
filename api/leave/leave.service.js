@@ -94,6 +94,8 @@ module.exports = {
         a.attendance_date,
         l.leave_name,
         d.leave_reason,
+        a.leave_approved,
+        a.leave_remark,
         d.days,
         d.half,
         e.id,
@@ -117,6 +119,95 @@ module.exports = {
       }
       return callback(null, results);
     });
+  },
+
+  getApprovedLeaveDatesWithEmployeeDetails: (callback) => {
+    const query = `
+      SELECT 
+        a.id as attendance_id,
+        a.attendance_date,
+        l.leave_name,
+        a.leave_approved,
+        a.leave_remark,
+        d.leave_reason,
+        d.days,
+        d.half,
+        e.id,
+        e.employee_code,
+        e.first_name,
+        e.last_name
+      FROM 
+        em_employee_attendance a
+      INNER JOIN 
+        em_employee_attendance_details d ON a.id = d.employee_attendance_id
+      INNER JOIN 
+        em_leave_type  l ON l.id = d.leave_type_id        
+      INNER JOIN 
+        em_employee e ON a.employee_id = e.id
+      WHERE 
+        a.present = 0 and a.leave_approved = 1`;
+
+    pool.query(query, (error, results, fields) => {
+      if (error) {
+        return callback(error, null);
+      }
+      return callback(null, results);
+    });
+  },
+
+  getDeniedLeaveDatesWithEmployeeDetails: (callback) => {
+    const query = `
+      SELECT 
+        a.id as attendance_id,
+        a.attendance_date,
+        l.leave_name,
+        a.leave_approved,
+        a.leave_remark,
+        d.leave_reason,
+        d.days,
+        d.half,
+        e.id,
+        e.employee_code,
+        e.first_name,
+        e.last_name
+      FROM 
+        em_employee_attendance a
+      INNER JOIN 
+        em_employee_attendance_details d ON a.id = d.employee_attendance_id
+      INNER JOIN 
+        em_leave_type  l ON l.id = d.leave_type_id        
+      INNER JOIN 
+        em_employee e ON a.employee_id = e.id
+      WHERE 
+        a.present = 0 and a.leave_approved = 2`;
+
+    pool.query(query, (error, results, fields) => {
+      if (error) {
+        return callback(error, null);
+      }
+      return callback(null, results);
+    });
+  },
+
+  updateLeaveDetails: (data, callback) => {
+    const { id, leave_remark, leave_approved_status } = data;
+    const leave_approved_date = new Date();
+
+    // Update query to set leave_remark, leave_approved_date, and leave_approved status
+    const updateQuery = `
+      UPDATE em_employee_attendance
+      SET leave_remark = ?, leave_approved_date = ?, leave_approved = ?
+      WHERE id = ?`;
+
+    // Execute the update query
+    pool.query(updateQuery, [leave_remark, leave_approved_date, leave_approved_status, id], (error, results) => {
+      if (error) {
+        console.error(error);
+        return callback(error);
+      }
+      // Return the updated results
+      return callback(null, results);
+    });
   }
-  
+
 };
