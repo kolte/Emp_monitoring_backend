@@ -15,7 +15,7 @@ const authenticate = (req, res, next) => {
 
   jwt.verify(token, process.env.secretkey, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ success: 0, message: `Unauthorized: Invalid token. ${err.message}` });
+      return res.status(401).json({ success: 0, message: `Unauthorized: Invalid token. ${err.message}`,refreshToken:true });
     }
     req.userId = decoded.userId;
     next();
