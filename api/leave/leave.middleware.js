@@ -24,6 +24,7 @@ const authenticate = (req, res, next) => {
         .json({
           success: 0,
           message: `Unauthorized: Invalid token. ${err.message}`,
+          refreshToken:true
         });
     }
     req.userId = decoded.userId;
