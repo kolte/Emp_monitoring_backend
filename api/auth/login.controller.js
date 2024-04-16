@@ -40,6 +40,8 @@ module.exports = {
         refreshToken,
         userId: user.userId,
         empID: user.employeeId,
+        roleId: user.roleId,
+        role_name: user.role_name,
       });
     } catch (error) {
       console.error("Login error:", error);
