@@ -126,7 +126,7 @@ module.exports = {
   },
 
 
-  getApprovedLeaveDatesWithEmployeeDetails: (callback) => {
+  getApprovedLeaveDatesWithEmployeeDetails: (employeeId, callback) => {
     const query = `
       SELECT 
         a.id as attendance_id,
@@ -152,7 +152,11 @@ module.exports = {
       WHERE 
         a.present = 0 and a.leave_approved = 1`;
 
-    pool.query(query, (error, results, fields) => {
+    if (employeeId) {
+      query += ` AND e.id = ?`;
+    }
+
+    pool.query(query, [employeeId], (error, results, fields) => {
       if (error) {
         return callback(error, null);
       }
@@ -160,7 +164,7 @@ module.exports = {
     });
   },
 
-  getDeniedLeaveDatesWithEmployeeDetails: (callback) => {
+  getDeniedLeaveDatesWithEmployeeDetails: (employeeId, callback) => {
     const query = `
       SELECT 
         a.id as attendance_id,
@@ -186,7 +190,11 @@ module.exports = {
       WHERE 
         a.present = 0 and a.leave_approved = 2`;
 
-    pool.query(query, (error, results, fields) => {
+    if (employeeId) {
+      query += ` AND e.id = ?`;
+    }
+
+    pool.query(query, [employeeId], (error, results, fields) => {
       if (error) {
         return callback(error, null);
       }
