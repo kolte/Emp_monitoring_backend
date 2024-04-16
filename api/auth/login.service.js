@@ -4,7 +4,12 @@ const pool = require("../../config/database");
 module.exports = {
   getUserByUsername: async (username, employeeId) => {
     return new Promise((resolve, reject) => {
-      const query = 'SELECT *,em_employee.id as employeeId,em_user.id as userId FROM em_user INNER JOIN em_employee ON em_user.id = em_employee.user_id WHERE (em_user.username = ? OR em_user.email = ?) LIMIT 1';
+      const query = `SELECT *, em_employee.id AS employeeId, em_user.id AS userId, em_roles.id AS roleId, em_roles.role_name AS roleName 
+      FROM em_user 
+      INNER JOIN em_employee ON em_user.id = em_employee.user_id 
+      INNER JOIN em_roles ON em_roles.id = em_employee.job_id 
+      WHERE (em_user.username = ? OR em_user.email = ?) 
+      LIMIT 1`;
       pool.query(query, [username, username, employeeId], (error, results) => {
         if (error) {
           console.error('Error in getUserByUsername:', error);
