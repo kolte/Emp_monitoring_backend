@@ -87,8 +87,8 @@ module.exports = {
     });
   },
 
-  getLeaveDatesWithEmployeeDetails: (callback) => {
-    const query = `
+  getLeaveDatesWithEmployeeDetails: (employeeId, callback) => {
+    let query = `
       SELECT 
         a.id as attendance_id,
         a.attendance_date,
@@ -113,13 +113,18 @@ module.exports = {
       WHERE 
         a.present = 0`;
 
-    pool.query(query, (error, results, fields) => {
+    if (employeeId) {
+      query += ` AND e.id = ?`;
+    }
+
+    pool.query(query, [employeeId], (error, results, fields) => {
       if (error) {
         return callback(error, null);
       }
       return callback(null, results);
     });
   },
+
 
   getApprovedLeaveDatesWithEmployeeDetails: (callback) => {
     const query = `

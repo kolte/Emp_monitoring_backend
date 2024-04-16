@@ -36,7 +36,8 @@ module.exports = {
     });
   },
   getLeaveDatesWithDetails: (req, res) => {
-    getLeaveDatesWithEmployeeDetails((err, results) => {
+    const { employeeId } = req.query;
+    getLeaveDatesWithEmployeeDetails(employeeId,(err, results) => {
       if (err) {
         return res.status(500).json({
           success: 0,
