@@ -2,9 +2,13 @@ const { getUsers } = require("./employeeList.service");
 
 module.exports = {
   getUsers: (req, res) => {
-    getUsers((err, results) => {
+    const { employeeId } = req.query;
+    getUsers(employeeId, (err, results) => {
       if (err) {
-        return;
+        return res.status(500).json({
+          success: 0,
+          message: "Internal server error",
+        });
       }
       return res.json({
         success: 1,
