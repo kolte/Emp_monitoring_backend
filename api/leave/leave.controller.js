@@ -37,7 +37,7 @@ module.exports = {
   },
   getLeaveDatesWithDetails: (req, res) => {
     const { employeeId } = req.query;
-    getLeaveDatesWithEmployeeDetails(employeeId,(err, results) => {
+    getLeaveDatesWithEmployeeDetails(employeeId, (err, results) => {
       if (err) {
         return res.status(500).json({
           success: 0,
@@ -52,7 +52,8 @@ module.exports = {
     });
   },
   getApprovedLeaveDatesWithDetails: (req, res) => {
-    getApprovedLeaveDatesWithEmployeeDetails((err, results) => {
+    const { employeeId } = req.query;
+    getApprovedLeaveDatesWithEmployeeDetails(employeeId, (err, results) => {
       if (err) {
         return res.status(500).json({
           success: 0,
@@ -67,7 +68,8 @@ module.exports = {
     });
   },
   getDeniedLeaveDatesWithDetails: (req, res) => {
-    getDeniedLeaveDatesWithEmployeeDetails((err, results) => {
+    const { employeeId } = req.query;
+    getDeniedLeaveDatesWithEmployeeDetails(employeeId, (err, results) => {
       if (err) {
         return res.status(500).json({
           success: 0,
