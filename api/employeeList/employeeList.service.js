@@ -14,7 +14,11 @@ module.exports = {
         ELSE 'Absent'
     END AS attendance_status,
     COALESCE(lv.total_leave_days, 0) AS total_leave_days,
-    COALESCE(TIMESTAMPDIFF(MINUTE, ep.punch_in, NOW()), 0) AS total_time
+    CONCAT(
+        FLOOR(total_time / 60), ' HRS ',
+        MOD(total_time, 60), ' MIN ',
+        MOD(total_time, 60), ' SEC'
+    ) AS formatted_total_time
 FROM 
     em_employee e
 LEFT JOIN (
@@ -57,7 +61,16 @@ LEFT JOIN (
     GROUP BY 
         employee_id
 ) AS lv ON e.id = lv.employee_id
-LEFT JOIN em_employee_attendance_punch ep ON e.id = ep.employee_id AND DATE(ep.punch_in) = CURDATE();
+LEFT JOIN (
+    SELECT 
+        employee_id,
+        TIMESTAMPDIFF(MINUTE, punch_in, NOW()) AS total_time
+    FROM 
+        em_employee_attendance_punch
+    WHERE 
+        DATE(punch_in) = CURDATE()
+) AS et ON e.id = et.employee_id;
+
 `;
 
     if (employeeId) {
