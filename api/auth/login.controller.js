@@ -119,12 +119,36 @@ module.exports = {
           }
         ); // Adjust secret and expiration
         res.status(200).json({
-          success:1,
+          success: 1,
           token
         })
       });
     } catch (error) {
       console.error("Login error:", error);
+      return res
+        .status(500)
+        .json({ success: 0, message: "Internal server error" });
+    }
+  },
+  resetPassword: async (req, res) => {
+    try {
+      const { username, newPassword } = req.body;
+      if (!username || !newPassword) {
+        return res
+          .status(400)
+          .json({ success: 0, message: "Username and new password are required" });
+      }
+      // Call the reset password function from the service
+      const result = await userService.resetPassword(username, newPassword);
+      if (!result) {
+        return res.status(404).json({ success: 0, message: "User not found" });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "Password reset successfully",
+      });
+    } catch (error) {
+      console.error("Reset password error:", error);
       return res
         .status(500)
         .json({ success: 0, message: "Internal server error" });

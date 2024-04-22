@@ -127,7 +127,7 @@ module.exports = {
 
 
   getApprovedLeaveDatesWithEmployeeDetails: (employeeId, callback) => {
-    const query = `
+    let query = `
       SELECT 
         a.id as attendance_id,
         a.attendance_date,
@@ -150,7 +150,7 @@ module.exports = {
       INNER JOIN 
         em_employee e ON a.employee_id = e.id
       WHERE 
-        a.present = 0 and a.leave_approved = 1`;
+        a.present = 0 AND a.leave_approved = 1`;
 
     if (employeeId) {
       query += ` AND e.id = ?`;
@@ -163,9 +163,10 @@ module.exports = {
       return callback(null, results);
     });
   },
+
 
   getDeniedLeaveDatesWithEmployeeDetails: (employeeId, callback) => {
-    const query = `
+    let query = `
       SELECT 
         a.id as attendance_id,
         a.attendance_date,
@@ -188,7 +189,7 @@ module.exports = {
       INNER JOIN 
         em_employee e ON a.employee_id = e.id
       WHERE 
-        a.present = 0 and a.leave_approved = 2`;
+        a.present = 0 AND a.leave_approved = 2`;
 
     if (employeeId) {
       query += ` AND e.id = ?`;
@@ -201,6 +202,7 @@ module.exports = {
       return callback(null, results);
     });
   },
+
 
   updateLeaveDetails: (data, callback) => {
     const { id, leave_remark, leave_approved_status } = data;
