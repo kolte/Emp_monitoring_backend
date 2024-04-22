@@ -24,5 +24,26 @@ module.exports = {
   },   
   validatePassword: async (password, hashedPassword) => {
     return await bcrypt.compare(password, hashedPassword);
+  },
+
+  resetPassword: async (userId, newPassword) => {
+    return new Promise((resolve, reject) => {
+      bcrypt.hash(newPassword, 10, (err, hash) => {
+        if (err) {
+          console.error('Error hashing password:', err);
+          reject(err);
+        } else {
+          const query = 'UPDATE em_user SET password = ? WHERE id = ?';
+          pool.query(query, [hash, userId], (error, results) => {
+            if (error) {
+              console.error('Error resetting password:', error);
+              reject(error);
+            } else {
+              resolve(results);
+            }
+          });
+        }
+      });
+    });
   }
 };
