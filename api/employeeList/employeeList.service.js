@@ -15,9 +15,9 @@ module.exports = {
     END AS attendance_status,
     COALESCE(lv.total_leave_days, 0) AS total_leave_days,
     CONCAT(
-        FLOOR(total_time / 60), ' HRS ',
-        MOD(total_time, 60), ' MIN ',
-        MOD(total_time, 60), ' SEC'
+        FLOOR(et.total_time / 3600), ' hours ',
+        FLOOR(MOD(et.total_time, 3600) / 60), ' minutes ',
+        MOD(et.total_time, 60), ' seconds'
     ) AS formatted_total_time
 FROM 
     em_employee e
@@ -64,11 +64,13 @@ LEFT JOIN (
 LEFT JOIN (
     SELECT 
         employee_id,
-        TIMESTAMPDIFF(MINUTE, punch_in, NOW()) AS total_time
+        SUM(TIMESTAMPDIFF(SECOND, punch_in, punch_out)) AS total_time
     FROM 
         em_employee_attendance_punch
     WHERE 
         DATE(punch_in) = CURDATE()
+    GROUP BY 
+        employee_id
 ) AS et ON e.id = et.employee_id;
 
 `;
