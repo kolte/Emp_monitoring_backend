@@ -71,9 +71,7 @@ LEFT JOIN (
         DATE(punch_in) = CURDATE()
     GROUP BY 
         employee_id
-) AS et ON e.id = et.employee_id;
-
-`;
+) AS et ON e.id = et.employee_id`;
 
     if (employeeId) {
       query += ` WHERE e.id = ${employeeId}`;
