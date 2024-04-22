@@ -13,7 +13,8 @@ module.exports = {
         WHEN a.present = 1 THEN 'Present'
         ELSE 'Absent'
     END AS attendance_status,
-    COALESCE(lv.total_leave_days, 0) AS total_leave_days
+    COALESCE(lv.total_leave_days, 0) AS total_leave_days,
+    COALESCE(TIMESTAMPDIFF(MINUTE, ep.punch_in, NOW()), 0) AS total_time
 FROM 
     em_employee e
 LEFT JOIN (
@@ -52,10 +53,11 @@ LEFT JOIN (
     FROM 
         em_employee_attendance
     WHERE 
-        leave_approved = 1 and present = 0 -- Assuming leave_approved = 1 indicates approved leave
+        leave_approved = 1 AND present = 0 -- Assuming leave_approved = 1 indicates approved leave
     GROUP BY 
         employee_id
-) AS lv ON e.id = lv.employee_id;
+) AS lv ON e.id = lv.employee_id
+LEFT JOIN em_employee_attendance_punch ep ON e.id = ep.employee_id AND DATE(ep.punch_in) = CURDATE();
 `;
 
     if (employeeId) {
