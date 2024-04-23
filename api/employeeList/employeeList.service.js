@@ -18,7 +18,12 @@ module.exports = {
         FLOOR(et.total_time / 3600), ' hours ',
         FLOOR(MOD(et.total_time, 3600) / 60), ' minutes ',
         MOD(et.total_time, 60), ' seconds'
-    ) AS formatted_total_time
+    ) AS formatted_total_time,
+    CONCAT(
+        FLOOR(up_time / 3600), ' hours ',
+        FLOOR(MOD(up_time, 3600) / 60), ' minutes ',
+        MOD(up_time, 60), ' seconds'
+    ) AS formatted_total_up_time
 FROM 
     em_employee e
 LEFT JOIN (
@@ -71,7 +76,18 @@ LEFT JOIN (
         DATE(punch_in) = CURDATE()
     GROUP BY 
         employee_id
-) AS et ON e.id = et.employee_id`;
+) AS et ON e.id = et.employee_id
+LEFT JOIN (
+    SELECT 
+        employee_id,
+        TIMESTAMPDIFF(SECOND, punch_in, NOW()) AS up_time
+    FROM 
+        em_employee_attendance_punch
+    WHERE 
+        DATE(punch_in) = CURDATE() AND punch_out IS NULL
+    GROUP BY 
+        employee_id
+) AS ut ON e.id = ut.employee_id`;
 
     if (employeeId) {
       query += ` WHERE e.id = ${employeeId}`;
