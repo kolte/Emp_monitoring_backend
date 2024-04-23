@@ -24,7 +24,17 @@ module.exports = {
             FLOOR(MOD(ut.up_time, 3600) / 60), ' minutes ',
             MOD(ut.up_time, 60), ' seconds'
         ) AS formatted_total_up_time,
-        et.total_punch_out
+        CONCAT(
+            FLOOR((ut.up_time - (et.total_time + IFNULL(rt.last_time, 0))) / 3600), ' hours ',
+            FLOOR(MOD((ut.up_time - (et.total_time + IFNULL(rt.last_time, 0))), 3600) / 60), ' minutes ',
+            MOD((ut.up_time - (et.total_time + IFNULL(rt.last_time, 0))), 60), ' seconds'
+        ) AS formatted_total_break_time,
+        et.total_punch_out,
+        CONCAT(
+            FLOOR((et.total_time + IFNULL(rt.last_time, 0)) / 3600), ' hours ',
+            FLOOR(MOD((et.total_time + IFNULL(rt.last_time, 0)), 3600) / 60), ' minutes ',
+            MOD((et.total_time + IFNULL(rt.last_time, 0)), 60), ' seconds'
+        ) AS formatted_totaltime
     FROM 
         em_employee e
     LEFT JOIN (
@@ -89,7 +99,18 @@ module.exports = {
             DATE(punch_in) = CURDATE()
         GROUP BY 
             employee_id
-    ) AS ut ON e.id = ut.employee_id`;
+    ) AS ut ON e.id = ut.employee_id 
+    LEFT JOIN (
+        SELECT 
+            employee_id,
+            TIMESTAMPDIFF(SECOND, MAX(punch_in), NOW()) AS last_time
+        FROM 
+            em_employee_attendance_punch
+        WHERE 
+            DATE(punch_in) = CURDATE() AND punch_out IS NULL
+        GROUP BY 
+            employee_id
+    ) AS rt ON e.id = rt.employee_id;`;
 
         if (employeeId) {
             query += ` WHERE e.id = ${employeeId}`;
