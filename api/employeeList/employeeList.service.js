@@ -23,7 +23,8 @@ module.exports = {
         FLOOR(up_time / 3600), ' hours ',
         FLOOR(MOD(up_time, 3600) / 60), ' minutes ',
         MOD(up_time, 60), ' seconds'
-    ) AS formatted_total_up_time
+    ) AS formatted_total_up_time,
+    total_punch_out
 FROM 
     em_employee e
 LEFT JOIN (
@@ -68,7 +69,7 @@ LEFT JOIN (
 ) AS lv ON e.id = lv.employee_id
 LEFT JOIN (
     SELECT 
-        employee_id,
+        employee_id,punch_out  AS total_punch_out,
         SUM(TIMESTAMPDIFF(SECOND, punch_in, punch_out)) AS total_time
     FROM 
         em_employee_attendance_punch
