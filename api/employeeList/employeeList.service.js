@@ -110,7 +110,7 @@ module.exports = {
             DATE(punch_in) = CURDATE() AND punch_out IS NULL
         GROUP BY 
             employee_id
-    ) AS rt ON e.id = rt.employee_id;`;
+    ) AS rt ON e.id = rt.employee_id`;
 
         if (employeeId) {
             query += ` WHERE e.id = ${employeeId}`;
