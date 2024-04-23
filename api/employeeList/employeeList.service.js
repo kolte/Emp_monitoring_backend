@@ -2,8 +2,8 @@ const bcrypt = require("bcrypt");
 const pool = require("../../config/database");
 
 module.exports = {
-  getUsers: (employeeId, callback) => {
-    let query = `SELECT 
+    getUsers: (employeeId, callback) => {
+        let query = `SELECT 
     e.*,
     d1.screenshot_url AS screenshot_a,
     d2.screenshot_url AS screenshot_b,
@@ -90,33 +90,33 @@ LEFT JOIN (
         employee_id
 ) AS ut ON e.id = ut.employee_id`;
 
-    if (employeeId) {
-      query += ` WHERE e.id = ${employeeId}`;
-    }
+        if (employeeId) {
+            query += ` WHERE e.id = ${employeeId}`;
+        }
 
-    pool.query(query, (error, results, fields) => {
-      if (error) {
-        return callback(error, null);
-      }
-      return callback(null, results);
-    });
-  },
-  getEmployeeAttendanceCount: (callback) => {
-    const attendanceQuery = `
-      SELECT 
-          COUNT(CASE WHEN a.present = 1 THEN 1 END) AS present_count,
-          COUNT(CASE WHEN a.present = 0 THEN 1 END) AS absent_count
-      FROM 
-          em_employee_attendance a
-      WHERE 
-          DATE(a.attendance_date) = CURDATE();
+        pool.query(query, (error, results, fields) => {
+            if (error) {
+                return callback(error, null);
+            }
+            return callback(null, results);
+        });
+    },
+    getEmployeeAttendanceCount: (callback) => {
+        const attendanceQuery = `
+    SELECT 
+    COUNT(*) AS total_count,
+    SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS present_count,
+    COUNT(*) - SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS absent_count
+FROM 
+    em_employee e
+LEFT JOIN em_employee_attendance a ON e.id = a.employee_id AND DATE(a.attendance_date) = CURDATE();
     `;
-    
-    pool.query(attendanceQuery, (error, results, fields) => {
-      if (error) {
-        return callback(error, null);
-      }
-      return callback(null, results[0]);
-    });
-  }
+
+        pool.query(attendanceQuery, (error, results, fields) => {
+            if (error) {
+                return callback(error, null);
+            }
+            return callback(null, results[0]);
+        });
+    }
 };
