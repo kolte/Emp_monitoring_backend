@@ -101,4 +101,22 @@ LEFT JOIN (
       return callback(null, results);
     });
   },
+  getEmployeeAttendanceCount: (callback) => {
+    const attendanceQuery = `
+      SELECT 
+          COUNT(CASE WHEN a.present = 1 THEN 1 END) AS present_count,
+          COUNT(CASE WHEN a.present = 0 THEN 1 END) AS absent_count
+      FROM 
+          em_employee_attendance a
+      WHERE 
+          DATE(a.attendance_date) = CURDATE();
+    `;
+    
+    pool.query(attendanceQuery, (error, results, fields) => {
+      if (error) {
+        return callback(error, null);
+      }
+      return callback(null, results[0]);
+    });
+  }
 };
