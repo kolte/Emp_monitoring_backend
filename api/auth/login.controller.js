@@ -25,13 +25,13 @@ module.exports = {
       }
 
       const token = jwt.sign({ userId: user.id }, process.env.secretkey, {
-        expiresIn: "1d",
+        expiresIn: "350d",
       }); // Adjust secret and expiration
       const refreshToken = jwt.sign(
         { userId: user.id },
         process.env.secretkey,
         {
-          expiresIn: "7d",
+          expiresIn: "365d",
         }
       );
       return res.status(200).json({

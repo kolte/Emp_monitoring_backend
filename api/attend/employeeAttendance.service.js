@@ -2,7 +2,7 @@ const pool = require('../../config/database');
 
 module.exports = {
   createOrUpdateAttendance: (data, callback) => {
-    const { employee_id, attendance_date, present, leave_approved } = data;
+    const { employee_id, attendance_date, present, leave_approved, break_type } = data;
 
     // Check if attendance with the same date exists for the employee
     const checkAttendanceQuery = 'SELECT * FROM em_employee_attendance WHERE employee_id = ? AND attendance_date = ?';
@@ -47,33 +47,52 @@ module.exports = {
 
               if (punchResults.length > 0) {
                 // Punch details exist, update the existing record
-                const updatePunchDetailsQuery = `
-                  UPDATE em_employee_attendance_punch  
-                  SET punch_out = NOW(), total_time = TIMESTAMPDIFF(MINUTE, punch_in, NOW()) 
-                  WHERE employee_id = ? AND employee_attendance_id = ? AND punch_out IS NULL`;
-
-                pool.query(
-                  updatePunchDetailsQuery,
-                  [employee_id, employeeAttendanceId],
-                  (updatePunchError, updatePunchResults) => {
-                    if (updatePunchError) {
-                      console.error(updatePunchError);
-                      return callback(updatePunchError);
+                let time_excess_span = null;
+                if (break_type === 'sb') {
+                    // If it's a short break, check if it exceeds 15 minutes
+                    const breakDurationMinutes = (new Date() - new Date(punchResults.punch_in)) / (1000 * 60);
+                    if (breakDurationMinutes > 15) {
+                        time_excess_span = breakDurationMinutes - 15;
                     }
-
-                    return callback(null, updateResults, updatePunchResults);
-                  }
+                } else if (break_type === 'lb') {
+                    // If it's a long break, check if it exceeds 1 hour
+                    const breakDurationMinutes = (new Date() - new Date(punchResults.punch_in)) / (1000 * 60);
+                    if (breakDurationMinutes > 60) {
+                        time_excess_span = breakDurationMinutes - 60;
+                    }
+                }
+                
+                const updatePunchDetailsQuery = `
+                    UPDATE em_employee_attendance_punch  
+                    SET punch_out = NOW(), 
+                        total_time = TIMESTAMPDIFF(MINUTE, punch_in, NOW()),
+                        break_type = ?,
+                        time_excess_span = ?
+                    WHERE employee_id = ? AND employee_attendance_id = ? AND punch_out IS NULL`;
+                
+                pool.query(
+                    updatePunchDetailsQuery,
+                    [break_type, time_excess_span, employee_id, employeeAttendanceId],
+                    (updatePunchError, updatePunchResults) => {
+                        if (updatePunchError) {
+                            console.error(updatePunchError);
+                            return callback(updatePunchError);
+                        }
+                
+                        return callback(null, updateResults, updatePunchResults);
+                    }
                 );
+                
               } else {
                 // Punch details do not exist, insert a new record
                 const insertPunchDetailsQuery = `
                   INSERT INTO em_employee_attendance_punch  
-                  (employee_id, employee_attendance_id, punch_in, punch_out) 
-                  VALUES (?, ?, NOW(), NULL)`;
+                  (employee_id, employee_attendance_id, break_type, punch_in, punch_out) 
+                  VALUES (?, ?, ?, NOW(), NULL)`;
 
                 pool.query(
                   insertPunchDetailsQuery,
-                  [employee_id, employeeAttendanceId],
+                  [employee_id, employeeAttendanceId, break_type],
                   (insertPunchError, insertPunchResults) => {
                     if (insertPunchError) {
                       console.error(insertPunchError);
@@ -109,12 +128,12 @@ module.exports = {
             // Now, handle the em_employee_attendance_punch table for insert case
             const insertPunchDetailsQuery = `
               INSERT INTO em_employee_attendance_punch  
-              (employee_id, employee_attendance_id, punch_in, punch_out) 
-              VALUES (?, ?, NOW(), NULL)`;
+              (employee_id, employee_attendance_id,break_type, punch_in, punch_out) 
+              VALUES (?, ?, ?, NOW(), NULL)`;
 
             pool.query(
               insertPunchDetailsQuery,
-              [employee_id, employeeAttendanceId],
+              [employee_id, employeeAttendanceId,break_type],
               (insertPunchError, insertPunchResults) => {
                 if (insertPunchError) {
                   console.error(insertPunchError);
