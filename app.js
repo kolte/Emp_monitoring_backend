@@ -33,6 +33,7 @@ const comment = require("./api/comment/comment.router");
 const menu = require("./api/menu/menu.router");
 const moduleset = require("./api/module/module.router");
 const permission = require("./api/permission/permission.router");
+const monthlyReport = require("./api/monthlyReport/monthlyReport.router");
 
 // Define routes
 app.use("/api/users", userRouter);
@@ -52,6 +53,7 @@ app.use("/api/comment", comment);
 app.use("/api/menu", menu);
 app.use("/api/module", moduleset);
 app.use("/api/permission", permission);
+app.use("/api/monthlyReport", monthlyReport);
 
 // Determine port based on environment
 const port = process.env.APP_TYPE === "prod" ? process.env.PORT : 3000;
