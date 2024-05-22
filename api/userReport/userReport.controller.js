@@ -35,8 +35,13 @@ exports.getTimeReport = (req, res) => {
 };
 
 exports.getEmployeeScreenshots = (req, res) => {
-  const { employeeId, date } = req.query;
-  getEmployeeScreenshots(employeeId, date, (error, results) => {
+  const { employeeId, date, page = 0, pageSize = 15 } = req.query;
+
+  // Convert page and pageSize to integers
+  const pageInt = parseInt(page, 10);
+  const pageSizeInt = parseInt(pageSize, 10);
+
+  getEmployeeScreenshots(employeeId, date, pageInt, pageSizeInt, (error, results) => {
     if (error) {
       console.error("Error fetching employee screenshots:", error);
       return res.status(500).json({ success: 0, message: "Internal Server Error" });
@@ -44,6 +49,7 @@ exports.getEmployeeScreenshots = (req, res) => {
     return res.json({ success: 1, data: results });
   });
 };
+
 
 exports.getLatestFourScreenshots = (req, res) => {
   const { employeeId } = req.query;
