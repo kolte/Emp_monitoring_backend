@@ -27,19 +27,24 @@ exports.getTimeReport = (employeeId,emp_date, callback) => {
   });
 };
 
-exports.getEmployeeScreenshots = (employeeId, date, callback) => {
+exports.getEmployeeScreenshots = (employeeId, date, page, pageSize, callback) => {
+  const offset = page * pageSize;
+  
   const query = `
     SELECT screenshot_url, screenshot_time, active_screen, mouse_click, keyboard_click
     FROM em_employee_attendance_pc_screenshot
     WHERE employee_id = ? AND DATE(screenshot_time) = ?
+    LIMIT ? OFFSET ?
   `;
-  pool.query(query, [employeeId, date], (error, results) => {
+  
+  pool.query(query, [employeeId, date, pageSize, offset], (error, results) => {
     if (error) {
       return callback(error, null);
     }
     return callback(null, results);
   });
 };
+
 
 exports.getLatestFourScreenshots = (employeeId, callback) => {
   const query = `
