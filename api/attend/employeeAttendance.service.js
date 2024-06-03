@@ -79,7 +79,7 @@ module.exports = {
                             return callback(updatePunchError);
                         }
                 
-                        return callback(null, updateResults, updatePunchResults);
+                        return callback(null, updateResults, updatePunchResults,break_type);
                     }
                 );
                 
@@ -99,7 +99,7 @@ module.exports = {
                       return callback(insertPunchError);
                     }
 
-                    return callback(null, updateResults, insertPunchResults);
+                    return callback(null, updateResults, insertPunchResults,break_type);
                   }
                 );
               }
@@ -140,7 +140,7 @@ module.exports = {
                   return callback(insertPunchError);
                 }
 
-                return callback(null, insertResults, insertPunchResults);
+                return callback(null, insertResults, insertPunchResults,break_type);
               }
             );
           }
