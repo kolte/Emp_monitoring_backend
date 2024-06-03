@@ -64,7 +64,8 @@ module.exports = {
     pool.query(query, [employeeId, date], (error, results) => {
       if (error) {
         return callback(error, null);
-      }
+      } 
+    
       return callback(null, results[0]);
     });
   }
