@@ -217,11 +217,11 @@ module.exports = {
       }
     });
   },
-  getTimeData: (data, callback) => {
+  getTimeData: (data,formattedDate, callback) => {
     // pool.query(`SELECT * FROM em_employee`, (error, results, fields) => {
     pool.query(
       `SELECT (SUM(TIME_TO_SEC(TIMEDIFF(punch_out, punch_in)))) AS total_time FROM em_employee_attendance_punch WHERE employee_id = ? AND DATE(punch_in) = ?`,
-      [data.employee_id,data.date_start],
+      [data.employee_id,formattedDate],
       (error, results, fields) => {
         if (error) {
           return callback(error, null);
