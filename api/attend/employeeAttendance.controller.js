@@ -3,10 +3,12 @@ const { createOrUpdateAttendance, tokenNullAttendance, getTimeData } = require("
 module.exports = {
   createAttendance: (req, res) => {
     const data = req.body;
-  
-    getTimeData(data, (err, timeResults) => {
+    const dateObj = new Date(data.date_start);
+    const formattedDate = dateObj.toISOString().split('T')[0]; // Format to YYYY-MM-DD
+    getTimeData(data,formattedDate, (err, timeResults) => {
+      console.error('timeline-',timeResults);
       if (err) {
-        console.error(err);
+        
         return res.status(500).json({
           success: 0,
           message: 'Database operation error in fetching time data',
