@@ -6,11 +6,7 @@ const pool = require("../../config/database");
 module.exports = {
     getUsers: (employeeId, callback) => {
         let query = `SELECT 
-    e.*,
-    d1.screenshot_url AS screenshot_a,
-    d2.screenshot_url AS screenshot_b,
-    d3.screenshot_url AS screenshot_c,
-    d4.screenshot_url AS screenshot_d,
+    e.*,    
     CASE
         WHEN a.present = 1 THEN 'Present'
         ELSE 'Absent'
@@ -22,14 +18,14 @@ module.exports = {
         MOD(et.total_time, 60), ' seconds'
     ) AS formatted_total_time,
     CONCAT(
-        FLOOR(total_break_sb / 3600), ' hours ',
-        FLOOR(MOD(total_break_sb, 3600) / 60), ' minutes ',
-        MOD(total_break_sb, 60), ' seconds'
+        FLOOR((esb.total_break_sb * 60) / 3600), ' hours ',
+        FLOOR(MOD((esb.total_break_sb * 60), 3600) / 60), ' minutes ',
+        MOD((esb.total_break_sb * 60), 60), ' seconds'
     ) AS formatted_total_sb,
     CONCAT(
-        FLOOR(total_break_lb / 3600), ' hours ',
-        FLOOR(MOD(total_break_lb, 3600) / 60), ' minutes ',
-        MOD(total_break_lb, 60), ' seconds'
+        FLOOR((elb.total_break_lb * 60) / 3600), ' hours ',
+        FLOOR(MOD((elb.total_break_lb * 60), 3600) / 60), ' minutes ',
+        MOD((elb.total_break_lb * 60), 60), ' seconds'
     ) AS formatted_total_lb,
     CONCAT(
         FLOOR(ut.up_time / 3600), ' hours ',
@@ -46,7 +42,11 @@ module.exports = {
         FLOOR((et.total_time + IFNULL(rt.last_time, 0)) / 3600), ' hours ',
         FLOOR(MOD((et.total_time + IFNULL(rt.last_time, 0)), 3600) / 60), ' minutes ',
         MOD((et.total_time + IFNULL(rt.last_time, 0)), 60), ' seconds'
-    ) AS formatted_totaltime
+    ) AS formatted_totaltime,
+    d1.screenshot_url AS screenshot_a,
+    d2.screenshot_url AS screenshot_b,
+    d3.screenshot_url AS screenshot_c,
+    d4.screenshot_url AS screenshot_d
 FROM 
     em_employee e
 LEFT JOIN (
@@ -135,7 +135,7 @@ LEFT JOIN (
         AND break_type = 'sb'
     GROUP BY 
         employee_id
-) AS esb ON e.id = et.employee_id
+) AS esb ON e.id = esb.employee_id
 LEFT JOIN (
     SELECT 
         employee_id,
@@ -147,7 +147,7 @@ LEFT JOIN (
         AND break_type = 'lb'
     GROUP BY 
         employee_id
-) AS elb ON e.id = et.employee_id`;
+) AS elb ON e.id = elb.employee_id`;
 
         if (employeeId) {
             query += ` WHERE e.id = ${employeeId}`;
