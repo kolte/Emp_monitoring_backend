@@ -1,14 +1,16 @@
 const bcrypt = require("bcrypt");
 const pool = require("../../config/database");
 
+
+
 module.exports = {
     getUsers: (employeeId, callback) => {
         let query = `SELECT 
-        e.*,
-        d1.screenshot_url AS screenshot_a,
-        d2.screenshot_url AS screenshot_b,
-        d3.screenshot_url AS screenshot_c,
-        d4.screenshot_url AS screenshot_d,
+     e.*,
+d1.screenshot_url AS screenshot_a,
+d2.screenshot_url AS screenshot_b,
+d3.screenshot_url AS screenshot_c,
+d4.screenshot_url AS screenshot_d,
         CASE
             WHEN a.present = 1 THEN 'Present'
             ELSE 'Absent'
@@ -19,6 +21,16 @@ module.exports = {
             FLOOR(MOD(et.total_time, 3600) / 60), ' minutes ',
             MOD(et.total_time, 60), ' seconds'
         ) AS formatted_total_time,
+         CONCAT(
+            FLOOR(total_break_sb / 3600), ' hours ',
+            FLOOR(MOD(total_break_sb, 3600) / 60), ' minutes ',
+            MOD(total_break_sb, 60), ' seconds'
+        ) AS formatted_total_sb,
+         CONCAT(
+            FLOOR(total_break_lb / 3600), ' hours ',
+            FLOOR(MOD(total_break_lb, 3600) / 60), ' minutes ',
+            MOD(total_break_lb, 60), ' seconds'
+        ) AS formatted_total_lb,
         CONCAT(
             FLOOR(ut.up_time / 3600), ' hours ',
             FLOOR(MOD(ut.up_time, 3600) / 60), ' minutes ',
@@ -110,7 +122,32 @@ module.exports = {
             DATE(punch_in) = CURDATE() AND punch_out IS NULL
         GROUP BY 
             employee_id
-    ) AS rt ON e.id = rt.employee_id`;
+    ) AS rt ON e.id = rt.employee_id
+    LEFT JOIN (
+    SELECT 
+        employee_id,
+        SUM(total_time) AS total_break_sb
+    FROM 
+        em_employee_attendance_punch
+    WHERE 
+        DATE(punch_in) = CURDATE()
+        AND break_type = 'sb'
+    GROUP BY 
+        employee_id
+    ) AS esb ON e.id = et.employee_id
+    LEFT JOIN (
+    SELECT 
+        employee_id,
+        SUM(total_time) AS total_break_lb
+    FROM 
+        em_employee_attendance_punch
+    WHERE 
+        DATE(punch_in) = CURDATE()
+        AND break_type = 'lb'
+    GROUP BY 
+        employee_id
+    ) AS elb ON e.id = et.employee_id
+`;
 
         if (employeeId) {
             query += ` WHERE e.id = ${employeeId}`;
