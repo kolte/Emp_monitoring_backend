@@ -32,7 +32,7 @@ exports.getMonthlyReport = (startDate, endDate, callback) => {
 
 exports.getAttendanceData = (startDate, endDate, employeeId, callback) => {
   const query = `
-    WITH RECURSIVE DateRange AS (
+WITH RECURSIVE DateRange AS (
   SELECT DATE_FORMAT(?, '%Y-%m-01') AS date -- Start date parameter
   UNION ALL
   SELECT DATE_ADD(date, INTERVAL 1 DAY)
@@ -47,14 +47,14 @@ SELECT
   SUM(ep.total_time) AS total,
   SUM(CASE WHEN ea.leave_approved = 1 THEN 1 ELSE 0 END) AS total_leave_approved,
   CONCAT(
-    FLOOR(SUM(CASE WHEN ep.break_type = 'sb' THEN ep.total_time ELSE 0 END) / 60), ' hours ',
-    FLOOR(MOD(SUM(CASE WHEN ep.break_type = 'sb' THEN ep.total_time ELSE 0 END), 60)), ' minutes ',
+    FLOOR(SUM(ep.total_time * (ep.break_type = 'sb')) / 60), ' hours ',
+    FLOOR(MOD(SUM(ep.total_time * (ep.break_type = 'sb')), 60)), ' minutes ',
     '0 seconds'
   ) AS formatted_total_sb, -- Short break total time formatted
   CONCAT(
-    FLOOR(SUM(CASE WHEN ep.break_type = 'lb' THEN ep.total_time ELSE 0 END) / 3600), ' hours ',
-    FLOOR(MOD(SUM(CASE WHEN ep.break_type = 'lb' THEN ep.total_time ELSE 0 END), 3600) / 60), ' minutes ',
-    MOD(SUM(CASE WHEN ep.break_type = 'lb' THEN ep.total_time ELSE 0 END), 60), ' seconds'
+    FLOOR(SUM(ep.total_time * (ep.break_type = 'lb')) / 60), ' hours ',
+    FLOOR(MOD(SUM(ep.total_time * (ep.break_type = 'lb')), 60)), ' minutes ',
+    '0 seconds'
   ) AS formatted_total_lb -- Long break total time formatted
 FROM DateRange
 LEFT JOIN em_employee_attendance AS ea 
