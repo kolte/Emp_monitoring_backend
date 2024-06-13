@@ -22,14 +22,14 @@ module.exports = {
         MOD(et.total_time, 60), ' seconds'
     ) AS formatted_total_time,
     CONCAT(
-        FLOOR(et.total_break_sb / 3600), ' hours ',
-        FLOOR(MOD(et.total_break_sb, 3600) / 60), ' minutes ',
-        MOD(et.total_break_sb, 60), ' seconds'
+        FLOOR(total_break_sb / 3600), ' hours ',
+        FLOOR(MOD(total_break_sb, 3600) / 60), ' minutes ',
+        MOD(total_break_sb, 60), ' seconds'
     ) AS formatted_total_sb,
     CONCAT(
-        FLOOR(et.total_break_lb / 3600), ' hours ',
-        FLOOR(MOD(et.total_break_lb, 3600) / 60), ' minutes ',
-        MOD(et.total_break_lb, 60), ' seconds'
+        FLOOR(total_break_lb / 3600), ' hours ',
+        FLOOR(MOD(total_break_lb, 3600) / 60), ' minutes ',
+        MOD(total_break_lb, 60), ' seconds'
     ) AS formatted_total_lb,
     CONCAT(
         FLOOR(ut.up_time / 3600), ' hours ',
