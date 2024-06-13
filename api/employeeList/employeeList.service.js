@@ -148,7 +148,6 @@ LEFT JOIN (
     GROUP BY 
         employee_id
 ) AS elb ON e.id = et.employee_id
-
 `;
 
         if (employeeId) {
