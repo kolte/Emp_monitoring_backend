@@ -147,8 +147,7 @@ LEFT JOIN (
         AND break_type = 'lb'
     GROUP BY 
         employee_id
-) AS elb ON e.id = et.employee_id
-`;
+) AS elb ON e.id = et.employee_id`;
 
         if (employeeId) {
             query += ` WHERE e.id = ${employeeId}`;
