@@ -44,16 +44,31 @@ SELECT
   MIN(ep.punch_in) AS punch_in, 
   MAX(ep.punch_out) AS punch_out, 
   HOUR(SEC_TO_TIME(SUM(ep.total_time * 60))) AS total_hours,
+  CONCAT(
+    FLOOR(
+      (SUM(TIMESTAMPDIFF(MINUTE, MIN(ep.punch_in), MAX(ep.punch_out))) 
+       - SUM(CASE WHEN ep.break_type = 'sb' THEN ep.total_time ELSE 0 END)
+       - SUM(CASE WHEN ep.break_type = 'lb' THEN ep.total_time ELSE 0 END)) / 60
+    ), ' hours ',
+    FLOOR(
+      MOD(
+        (SUM(TIMESTAMPDIFF(MINUTE, MIN(ep.punch_in), MAX(ep.punch_out))) 
+         - SUM(CASE WHEN ep.break_type = 'sb' THEN ep.total_time ELSE 0 END)
+         - SUM(CASE WHEN ep.break_type = 'lb' THEN ep.total_time ELSE 0 END)), 60
+      )
+    ), ' minutes ',
+    '0 seconds'
+  ) AS formatted_total_working, -- Total working time formatted
   SUM(ep.total_time) AS total,
   SUM(CASE WHEN ea.leave_approved = 1 THEN 1 ELSE 0 END) AS total_leave_approved,
   CONCAT(
-    FLOOR(SUM(ep.total_time * (ep.break_type = 'sb')) / 60), ' hours ',
-    FLOOR(MOD(SUM(ep.total_time * (ep.break_type = 'sb')), 60)), ' minutes ',
+    FLOOR(SUM(CASE WHEN ep.break_type = 'sb' THEN ep.total_time ELSE 0 END) / 60), ' hours ',
+    FLOOR(MOD(SUM(CASE WHEN ep.break_type = 'sb' THEN ep.total_time ELSE 0 END), 60)), ' minutes ',
     '0 seconds'
   ) AS formatted_total_sb, -- Short break total time formatted
   CONCAT(
-    FLOOR(SUM(ep.total_time * (ep.break_type = 'lb')) / 60), ' hours ',
-    FLOOR(MOD(SUM(ep.total_time * (ep.break_type = 'lb')), 60)), ' minutes ',
+    FLOOR(SUM(CASE WHEN ep.break_type = 'lb' THEN ep.total_time ELSE 0 END) / 60), ' hours ',
+    FLOOR(MOD(SUM(CASE WHEN ep.break_type = 'lb' THEN ep.total_time ELSE 0 END), 60)), ' minutes ',
     '0 seconds'
   ) AS formatted_total_lb -- Long break total time formatted
 FROM DateRange
