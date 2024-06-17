@@ -1,13 +1,13 @@
 const pool = require("../../config/database");
 
 exports.getMonthlyReport = (startDate, endDate, callback) => {
-  pool.query(`
+  const query = `
     WITH RECURSIVE DateRange AS (
-      SELECT DATE_FORMAT(?, '%Y-%m-01') AS date -- Start date parameter
+      SELECT DATE_FORMAT(?, '%Y-%m-01') AS date
       UNION ALL
       SELECT DATE_ADD(date, INTERVAL 1 DAY)
       FROM DateRange
-      WHERE DATE_ADD(date, INTERVAL 1 DAY) < DATE_FORMAT(DATE_ADD(?, INTERVAL 1 MONTH), '%Y-%m-01') -- End date parameter
+      WHERE DATE_ADD(date, INTERVAL 1 DAY) < DATE_FORMAT(DATE_ADD(?, INTERVAL 1 MONTH), '%Y-%m-01')
     )
     SELECT 
       DateRange.date AS attendance_date,
@@ -22,7 +22,9 @@ exports.getMonthlyReport = (startDate, endDate, callback) => {
     LEFT JOIN em_employee_attendance AS ea ON DateRange.date = ea.attendance_date
     LEFT JOIN em_employee_attendance_punch AS ep ON ep.employee_attendance_id = ea.id  
     GROUP BY DateRange.date;
-  `, [startDate, endDate], (error, results, fields) => {
+  `;
+
+  pool.query(query, [startDate, endDate], (error, results, fields) => {
     if (error) {
       return callback(error, null);
     }
@@ -44,21 +46,8 @@ SELECT
   MIN(ep.punch_in) AS punch_in, 
   MAX(ep.punch_out) AS punch_out, 
   HOUR(SEC_TO_TIME(SUM(ep.total_time * 60))) AS total_hours,
-  CONCAT(
-    FLOOR(
-      (SUM(TIMESTAMPDIFF(MINUTE, MIN(ep.punch_in), MAX(ep.punch_out))) 
-       - SUM(CASE WHEN ep.break_type = 'sb' THEN ep.total_time ELSE 0 END)
-       - SUM(CASE WHEN ep.break_type = 'lb' THEN ep.total_time ELSE 0 END)) / 60
-    ), ' hours ',
-    FLOOR(
-      MOD(
-        (SUM(TIMESTAMPDIFF(MINUTE, MIN(ep.punch_in), MAX(ep.punch_out))) 
-         - SUM(CASE WHEN ep.break_type = 'sb' THEN ep.total_time ELSE 0 END)
-         - SUM(CASE WHEN ep.break_type = 'lb' THEN ep.total_time ELSE 0 END)), 60
-      )
-    ), ' minutes ',
-    '0 seconds'
-  ) AS formatted_total_working, -- Total working time formatted
+  SUM(CASE WHEN ep.break_type = 'sb' THEN ep.total_time ELSE 0 END) AS total_sb,
+  SUM(CASE WHEN ep.break_type = 'lb' THEN ep.total_time ELSE 0 END) AS total_lb,
   SUM(ep.total_time) AS total,
   SUM(CASE WHEN ea.leave_approved = 1 THEN 1 ELSE 0 END) AS total_leave_approved,
   CONCAT(
@@ -77,6 +66,8 @@ LEFT JOIN em_employee_attendance AS ea
 LEFT JOIN em_employee_attendance_punch AS ep 
   ON ep.employee_attendance_id = ea.id  
 GROUP BY DateRange.date;
+
+
   `;
 
   pool.query(query, [startDate, endDate, employeeId], (error, results, fields) => {
