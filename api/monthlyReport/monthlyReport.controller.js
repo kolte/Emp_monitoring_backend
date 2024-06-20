@@ -37,12 +37,18 @@ exports.getDashboardData = (req, res) => {
     // Process results to the desired format
     const dataMap = new Map();
     
+    // Only consider hours from 08:00 to 20:00 (08 to 20)
+    const startHour = 8;
+    const endHour = 20;
+
     results.forEach(row => {
       const { name, hour, total_clicks } = row;
-      if (!dataMap.has(name)) {
-        dataMap.set(name, { name, hours: new Array(24).fill(0) }); // Initialize hours array with 24 zeros
+      if (hour >= startHour && hour < endHour) {
+        if (!dataMap.has(name)) {
+          dataMap.set(name, { name, hours: new Array(endHour - startHour).fill(0) }); // Initialize hours array
+        }
+        dataMap.get(name).hours[hour - startHour] = total_clicks; // Map hour to the index in hours array
       }
-      dataMap.get(name).hours[hour] = total_clicks;
     });
 
     const formattedResults = Array.from(dataMap.values());
@@ -50,3 +56,5 @@ exports.getDashboardData = (req, res) => {
     return res.json({ success: 1, data: formattedResults });
   });
 };
+
+
