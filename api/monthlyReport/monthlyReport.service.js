@@ -77,3 +77,43 @@ GROUP BY DateRange.date;
     return callback(null, results);
   });
 };
+
+
+exports.getDashoardGraph = (employeeId, callback) => {
+  let query = `
+SELECT
+    e.first_name AS name,
+    HOUR(ea.created_at) AS hour,
+    SUM(ea.mouse_click) + SUM(ea.keyboard_click) AS total_clicks
+FROM
+    em_employee_attendance_pc_screenshot ea
+JOIN
+    em_employee e ON ea.employee_id = e.id
+WHERE
+    ea.created_at BETWEEN CONCAT(CURDATE(), ' 08:00:00') AND CONCAT(CURDATE(), ' 20:00:00')
+`;
+
+  // Add employee filter condition if employeeId is provided
+  if (employeeId) {
+    query += ' AND ea.employee_id = ?';
+  }
+
+  query += `
+GROUP BY
+    e.first_name,
+    HOUR(ea.created_at)
+ORDER BY
+    e.first_name,
+    hour;
+  `;
+
+  const params = employeeId ? [employeeId] : [];
+
+  pool.query(query, params, (error, results, fields) => {
+    if (error) {
+      return callback(error, null);
+    }
+    return callback(null, results);
+  });
+};
+
