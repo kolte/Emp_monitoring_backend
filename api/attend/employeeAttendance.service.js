@@ -2,8 +2,9 @@ const pool = require('../../config/database');
 
 module.exports = {
   createOrUpdateAttendance: (data, callback) => {
+    
     const { employee_id, attendance_date, present, leave_approved, break_type } = data;
-
+    console.log(break_type);
     // Check if attendance with the same date exists for the employee
     const checkAttendanceQuery = 'SELECT * FROM em_employee_attendance WHERE employee_id = ? AND attendance_date = ?';
     pool.query(checkAttendanceQuery, [employee_id, attendance_date], (error, results) => {
@@ -45,7 +46,7 @@ module.exports = {
                 return callback(punchError);
               }
 
-              if (punchResults.length > 0) {
+              if (punchResults.length > 0 &&(break_type == 'po' || break_type=='sb' || break_type=='lb')) {
                 // Punch details exist, update the existing record
                 let time_excess_span = null;
                 if (break_type === 'sb') {
