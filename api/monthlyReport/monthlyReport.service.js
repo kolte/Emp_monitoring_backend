@@ -11,11 +11,15 @@ exports.getMonthlyReport = (startDate, endDate, callback) => {
     )
     SELECT 
       DateRange.date AS attendance_date,
+      MIN(ep.punch_in) AS punch_in, 
+      MAX(ep.punch_out) AS punch_out,
       COUNT(DISTINCT ea.employee_id) AS total_employees_present,
       (SELECT COUNT(id) FROM em_employee) AS total_employees,
       (SELECT COUNT(id) FROM em_employee) - COUNT(DISTINCT ea.employee_id) AS total_employees_absent,
       MIN(ep.punch_in) AS punch_in, 
       HOUR(SEC_TO_TIME(SUM(ep.total_time * 60))) AS total_hours,
+      SUM(CASE WHEN ep.break_type = 'sb' THEN ep.total_time ELSE 0 END) AS total_sb,
+      SUM(CASE WHEN ep.break_type = 'lb' THEN ep.total_time ELSE 0 END) AS total_lb,
       SUM(ep.total_time) AS total,
       SUM(CASE WHEN ea.leave_approved = 1 THEN 1 ELSE 0 END) AS total_leave_approved
     FROM DateRange
