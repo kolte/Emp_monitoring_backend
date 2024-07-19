@@ -17,6 +17,7 @@ app.use("/uploads", express.static("uploads"));
 
 // Import routers
 const userRouter = require("./api/users/user.router");
+const apiLog = require("./api/apiLog/apiLog.router");
 const empRouter = require("./api/employee/employee.router");
 const filesupload = require("./api/filesupload/filesupload.router");
 const login = require("./api/auth/login.router");
@@ -37,6 +38,7 @@ const monthlyReport = require("./api/monthlyReport/monthlyReport.router");
 
 // Define routes
 app.use("/api/users", userRouter);
+app.use("/api/apilog", apiLog);
 app.use("/api/employee", empRouter);
 app.use("/api/filesupload", filesupload);
 app.use("/api/login", login);
