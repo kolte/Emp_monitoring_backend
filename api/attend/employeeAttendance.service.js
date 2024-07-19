@@ -220,11 +220,8 @@ module.exports = {
   },
   getTimeData: (data,formattedDate, callback) => {
     // pool.query(`SELECT * FROM em_employee`, (error, results, fields) => {
-      // SELECT MAX(punch_out) AS total_punch_out,MIN(punch_in) AS total_punch_in,TIME_TO_SEC(TIMEDIFF(MAX(punch_out), MIN(punch_in))) AS total_time FROM em_employee_attendance_punch WHERE employee_id = ? AND DATE(punch_in) = ?
-
-      
     pool.query(
-      `SELECT MAX(punch_out) AS total_punch_out,MIN(punch_in) AS total_punch_in,TIME_TO_SEC(TIMEDIFF(MAX(punch_out), (SUM(TIME_TO_SEC(TIMEDIFF(punch_out, punch_in)))) AS total_time FROM em_employee_attendance_punch WHERE employee_id = ? AND DATE(punch_in) = ?`,
+      `SELECT MAX(punch_out) AS total_punch_out,MIN(punch_in) AS total_punch_in,TIME_TO_SEC(TIMEDIFF(MAX(punch_out), MIN(punch_in))) AS total_time FROM em_employee_attendance_punch WHERE employee_id = ? AND DATE(punch_in) = ?`,
       [data.employee_id,formattedDate],
       (error, results, fields) => {
         if (error) {
