@@ -8,5 +8,6 @@ router.get('/departments', datafetchController.getDepartments);
 router.get('/jobs', datafetchController.getJobs);
 router.get('/users', datafetchController.getUsers);
 router.get("/attendance", datafetchController.getLatestAttendance);
+router.get("/activitylog", datafetchController.getLogActivity);
 
 module.exports = router;

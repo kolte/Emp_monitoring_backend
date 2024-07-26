@@ -68,5 +68,21 @@ module.exports = {
     
       return callback(null, results[0]);
     });
+  },
+
+  getLogActivity: (employeeId, date, callback) => {
+    const query = `
+      SELECT *
+      FROM api_activity_log
+      WHERE employee_id = ? AND DATE(timestamp) = ? 
+      ORDER BY timestamp DESC
+    `;
+    pool.query(query, [employeeId, date], (error, results) => {
+      if (error) {
+        return callback(error, null);
+      } 
+    
+      return callback(null, results[0]);
+    });
   }
 };
