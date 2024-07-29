@@ -5,7 +5,7 @@ module.exports = {
   getUsers: (id, callback) => {
     // pool.query(`SELECT * FROM em_employee`, (error, results, fields) => {
     pool.query(
-      `SELECT * FROM em_user where id=?`,
+      `SELECT e.*,em.profile_picture AS profile FROM em_user e JOIN em_employee em ON e.id = em.user_id  where e.id=? `,
       id,
       (error, results, fields) => {
         if (error) {
