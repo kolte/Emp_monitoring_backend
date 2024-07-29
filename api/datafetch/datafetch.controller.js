@@ -77,8 +77,10 @@ module.exports = {
   },
    
   getLogActivity: (req, res) => {
-    const { employeeId, date } = req.query;
-    datafetchService.getLogActivity(employeeId, date, (error, result) => {
+    const { employeeId, date,page = 0, pageSize = 15 } = req.query;
+    const pageInt = parseInt(page, 10);
+  const pageSizeInt = parseInt(pageSize, 10);
+    datafetchService.getLogActivity(employeeId, date,pageInt, pageSizeInt, (error, result) => {
       if (error) {
         return res.status(500).json({ success: 0, message: error.message });
       }

@@ -70,14 +70,16 @@ module.exports = {
     });
   },
 
-  getLogActivity: (employeeId, date, callback) => {
+  getLogActivity: (employeeId, date,page, pageSize, callback) => {
+    const offset = page * pageSize;
     const query = `
       SELECT *
       FROM api_activity_log
       WHERE employee_id = ? AND DATE(timestamp) = ? 
       ORDER BY timestamp DESC
+      LIMIT ? OFFSET ?
     `;
-    pool.query(query, [employeeId, date], (error, results) => {
+    pool.query(query, [employeeId, date,pageSize, offset], (error, results) => {
       if (error) {
         return callback(error, null);
       } 
