@@ -164,13 +164,7 @@ LEFT JOIN (
     },
     getEmployeeAttendanceCount: (callback) => {
         const attendanceQuery = `
-    SELECT 
-    COUNT(*) AS total_count,
-    SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS present_count,
-    COUNT(*) - SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS absent_count
-FROM 
-    em_employee e
-LEFT JOIN em_employee_attendance a ON e.id = a.employee_id AND DATE(a.attendance_date) = CURDATE();
+    SELECT COUNT(*) AS total_count, SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS present_count, COUNT(*) - SUM(CASE WHEN a.present = 1 THEN 1 ELSE 0 END) AS absent_count, SUM(p.mouse_click)/2 + SUM(p.keyboard_click)/2 AS mouce_count FROM em_employee e LEFT JOIN em_employee_attendance a ON e.id = a.employee_id AND DATE(a.attendance_date) = CURDATE() CROSS JOIN em_employee_attendance_pc_screenshot p;
     `;
 
         pool.query(attendanceQuery, (error, results, fields) => {
