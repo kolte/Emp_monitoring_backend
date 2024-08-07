@@ -17,7 +17,7 @@ module.exports = {
         em_department d ON e.department_id = d.id
       JOIN 
         em_user u ON e.reporting_to = u.id`;
-    
+
     pool.query(query, (error, results) => {
       if (error) {
         return callback(error, null);
@@ -27,7 +27,7 @@ module.exports = {
   },
 
   getDepartments: (callback) => {
-    pool.query('SELECT * FROM em_department', (error, results) => {
+    pool.query("SELECT * FROM em_department", (error, results) => {
       if (error) {
         return callback(error, null);
       }
@@ -36,7 +36,7 @@ module.exports = {
   },
 
   getJobs: (callback) => {
-    pool.query('SELECT * FROM em_roles', (error, results) => {
+    pool.query("SELECT * FROM em_roles", (error, results) => {
       if (error) {
         return callback(error, null);
       }
@@ -45,7 +45,7 @@ module.exports = {
   },
 
   getUsers: (callback) => {
-    pool.query('SELECT * FROM em_user', (error, results) => {
+    pool.query("SELECT * FROM em_user", (error, results) => {
       if (error) {
         return callback(error, null);
       }
@@ -64,13 +64,13 @@ module.exports = {
     pool.query(query, [employeeId, date], (error, results) => {
       if (error) {
         return callback(error, null);
-      } 
-    
+      }
+
       return callback(null, results[0]);
     });
   },
 
-  getLogActivity: (employeeId, date,page, pageSize, callback) => {
+  getLogActivity: (employeeId, date, page, pageSize, callback) => {
     const offset = page * pageSize;
     const query = `
       SELECT *
@@ -79,12 +79,32 @@ module.exports = {
       ORDER BY timestamp DESC
       LIMIT ? OFFSET ?
     `;
-    pool.query(query, [employeeId, date,pageSize, offset], (error, results) => {
-      if (error) {
-        return callback(error, null);
-      } 
-    
-      return callback(null, results[0]);
-    });
-  }
+    pool.query(
+      query,
+      [employeeId, date, pageSize, offset],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, results[0]);
+      }
+    );
+  },
+
+  employeeActivity: (employeeId, callback) => {
+    const query = `
+      SELECT * FROM em_employee_attendance_pc_screenshot WHERE employee_id = ? AND created_at > NOW() - INTERVAL 15 MINUTE `;
+    pool.query(
+      query,
+      [employeeId],
+      (error, results) => {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, results[0]);
+      }
+    );
+  },
 };
